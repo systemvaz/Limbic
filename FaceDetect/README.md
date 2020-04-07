@@ -8,3 +8,5 @@ A train-test split of 90% and 10% respectively was used.
 ## Architecture
 A ResNet56 convolutional neural network (CNN) is trained on the above dataset used for the detection.
 OpenCV with frontal face Haar Cascade is utilised to detect and crop images of faces from the users video feed.
+## Training results
+![alt text](https://github.com/systemvaz/Limbic/blob/master/FaceDetect/img/training_results_resnet56.png)
