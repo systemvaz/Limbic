@@ -1,2 +1,2 @@
 # Limbic
-Explores possible improvements in human-machine interaction through user facial emotion and text sentiment detection and analysis.
+•	Explores possible improvements in chatbot interaction using user facial emotion detection and text sentiment analysis implemented in TensorFlow and Python.
