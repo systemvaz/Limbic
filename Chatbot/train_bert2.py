@@ -11,18 +11,15 @@ import sys
 import os
 import io
 
-VOCAB_SIZE = 3115
-max_length_q = 30
-max_length_a = 30
-batch_size = 50
+VOCAB_SIZE = 118478
+max_length = 80
+batch_size = 25
 
 os.environ['TFHUB_CACHE_DIR'] = 'D:\Development\TensorFlow\TFHUB_CACHE'
 os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 # Load data
-# data = h5py.File(os.curdir + '/data/training_data_1milMsg_30kVocab_BERT.h5', 'r')
-data = h5py.File(os.curdir + '/data/training_data_1kMsg_30kVocab_BERT.h5', 'r')
-
+data = h5py.File(os.curdir + '/data/training_data_500kMsg_BERT.h5', 'r')
 
 print('Loading Encoder data...')
 input_ids_enc = np.array(data['input_ids_vals_ENCin'])
@@ -50,22 +47,25 @@ print(output_dec.shape)
 
 # Define Model
 def BuildChatNetwork():
-    input1_enc = tf.keras.layers.Input(shape=(None,), dtype="int32", name='enc_input_data')
-    input2_enc = tf.keras.layers.Input(shape=(None,), dtype="int32", name='enc_mask_data')
-    input3_enc = tf.keras.layers.Input(shape=(None,), dtype="int32", name='enc_segment_data')
+    input1_enc = tf.keras.layers.Input(shape=(max_length,), batch_size=batch_size, dtype="int32", name='enc_input_data')
+    input2_enc = tf.keras.layers.Input(shape=(max_length,), batch_size=batch_size, dtype="int32", name='enc_mask_data')
+    input3_enc = tf.keras.layers.Input(shape=(max_length,), batch_size=batch_size, dtype="int32", name='enc_segment_data')
 
-    albert_inputs_enc = dict(input_ids=input1_enc, input_mask=input2_enc, segment_ids=input3_enc)
-    bert_layer1 = hub.KerasLayer("https://tfhub.dev/google/albert_xlarge/2", trainable=False, signature='tokens', output_key='sequence_output')
+    bert_layer1 = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_cased_L-12_H-768_A-12/1", trainable=False)
+    _, sequence_output = bert_layer1([input1_enc, input2_enc, input3_enc])
     
-    sequence_output1 = bert_layer1(albert_inputs_enc)
-    _, state_h, state_c = tf.keras.layers.LSTM(768, return_state=True) (sequence_output1)
+    _, state_h, state_c = tf.keras.layers.LSTM(768, return_state=True) (sequence_output)
     encoder_states = [state_h, state_c]
 
-    input1_dec = tf.keras.layers.Input(shape=(None,), dtype="int32", name='dec_input_data')
-    decoder_embedding = tf.keras.layers.Embedding(VOCAB_SIZE, 768, mask_zero=True) (decoder_inputs)
+    input1_dec = tf.keras.layers.Input(shape=(max_length,), batch_size=batch_size, dtype="int32", name='dec_input_data')
+    input2_dec = tf.keras.layers.Input(shape=(max_length,), batch_size=batch_size, dtype="int32", name='dec_mask_data')
+    input3_dec = tf.keras.layers.Input(shape=(max_length,), batch_size=batch_size, dtype="int32", name='dec_segment_data')
+
+    # bert_layer2 = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_cased_L-12_H-768_A-12/1", trainable=False)
+    _, sequence_output2 = bert_layer1([input1_dec, input2_dec, input3_dec])
 
     decoder_lstm = tf.keras.layers.LSTM(768, return_state=True, return_sequences=True)
-    decoder_outputs, _ , _ = decoder_lstm(decoder_embedding, initial_state=encoder_states)
+    decoder_outputs, _ , _ = decoder_lstm(sequence_output2, initial_state=encoder_states)
 
     decoder_dense = tf.keras.layers.Dense(VOCAB_SIZE, activation=tf.keras.activations.softmax) 
     output = decoder_dense (decoder_outputs)
@@ -80,9 +80,23 @@ def BuildChatNetwork():
 model = BuildChatNetwork()
 print(model.summary())
 
+# class MyCustomCallback(tf.keras.callbacks.Callback):
+#   def on_train_batch_end(self, batch, logs=None):
+#     encoder_model = tf.keras.models.Model(encoder_inputs, encoder_states)
+    
+#     decoder_state_input_h = tf.keras.layers.Input(shape=(200 ,))
+#     decoder_state_input_c = tf.keras.layers.Input(shape=(200 ,))
+    
+#     decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+    
+#     decoder_outputs, state_h, state_c = decoder_lstm(decoder_embedding , initial_state=decoder_states_inputs)
+#     decoder_states = [state_h, state_c]
+#     decoder_outputs = decoder_dense(decoder_outputs)
+#     decoder_model = tf.keras.models.Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
+
 # Prepare model saving directory.
 save_dir = os.path.join(os.getcwd(), 'models')
-model_name = 'ChatBot_model_ALBERT_1mil_TEST.{epoch:03d}.h5'
+model_name = 'ChatBot_model_BERT.{epoch:03d}.h5'
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 filepath = os.path.join(save_dir, model_name)
