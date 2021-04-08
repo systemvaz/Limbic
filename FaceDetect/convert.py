@@ -1,3 +1,8 @@
+# ----------------------------------------------
+# Author: Alex Varano
+# Convert fer2013.csv pixel data into PNG images
+# ----------------------------------------------
+
 import pandas as pd
 import numpy as np
 import cv2

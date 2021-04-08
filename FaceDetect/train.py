@@ -1,3 +1,8 @@
+# -----------------------------------------------
+# Author: Alex Varano
+# Train new Resnet56 model on the FER2013 dataset
+# -----------------------------------------------
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from keras.preprocessing.image import ImageDataGenerator
@@ -12,17 +17,17 @@ import keras
 import glob
 import os
 # model.py....
-import model as resnet
+from model import resnet
 
-# Set for multi-gpu
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
+# Set for multi-gpu training
+os.environ["CUDA_VISIBLE_DEVICES"]="0,1"
 
 # Model and data variables/constants here
 def get_model_consts():
-    BATCH_SIZE = 128
-    EPOCHS = 200
+    BATCH_SIZE = 256
+    EPOCHS = 100
     NUM_CLASSES = 7
-    n = 6
+    n = 18
     version = 2
     depth = n * 9 + 2
     model_type = 'ResNet%dv%d' % (depth, version)
@@ -31,13 +36,13 @@ def get_model_consts():
 
 def get_data_consts():
     data_file = os.curdir + '/dataset/fer2013.csv'
-    image_dir = os.curdir + '/fer_images'
+    image_dir = os.curdir + '/dataset/fer_images/'
 
     return data_file, image_dir
 
 # Create numpy array of image data
-def image_array(image_dir):
-    filelist = sorted(glob.glob(image_dir + '/*.png'), key=lambda name: int(name[13:-4]))
+def get_image_array(image_dir):
+    filelist = sorted(glob.glob(image_dir + '*.png'), key=lambda name: int(name[len(image_dir):-4]))
     image_array = np.array([np.array(Image.open(fname)) for fname in filelist])
     image_array = image_array.reshape(image_array.shape[0],48,48,1)
     input_shape = image_array.shape[1:]
@@ -47,7 +52,7 @@ def image_array(image_dir):
     return input_shape, image_array
 
 # Create numpy array of label data
-def label_array(data_file):
+def get_label_array(data_file):
     label_data = pd.read_csv(data_file, usecols=['emotion'])
     label_array = label_data.to_numpy()
 
@@ -80,14 +85,14 @@ def print_shapes(x_train, y_train, x_val, y_val):
 
 #Loss rate scheduler function. Loss rate determined by epoch number
 def lr_schedule(EPOCH):
-    lr = 1e-3
-    if EPOCH > 180:
+    lr = 1e-2
+    if EPOCH > 100:
         lr *= 0.5e-3
-    elif EPOCH > 160:
+    elif EPOCH > 90:
         lr *= 1e-3
-    elif EPOCH > 120:
+    elif EPOCH > 25:
         lr *= 1e-2
-    elif EPOCH > 80:
+    elif EPOCH > 12:
         lr *= 1e-1
     print('Learning rate: ', lr)
     return lr
@@ -101,10 +106,10 @@ def image_augmentation(x_train):
             samplewise_std_normalization=False,
             zca_whitening=False,
             zca_epsilon=1e-06,
-            rotation_range=0,
+            rotation_range=22.5,
             zoom_range = 0,
-            width_shift_range=0.1,
-            height_shift_range=0.1,
+            width_shift_range=0.0,
+            height_shift_range=0.0,
             shear_range=0.,
             channel_shift_range=0.,
             fill_mode='nearest',
@@ -116,8 +121,8 @@ def image_augmentation(x_train):
     return datagen
 
 # Build model!
-def compile_model(input_shape, depth):
-    model = resnet(input_shape=input_shape, depth=depth)
+def compile_model(input_shape, depth, NUM_CLASSES):
+    model = resnet(input_shape=input_shape, depth=depth, num_classes=NUM_CLASSES)
     opt = tf.keras.optimizers.Adam
 
     model.compile(loss='categorical_crossentropy',
@@ -143,24 +148,24 @@ def model_save_dir(model_type):
 # Prepare callbacks for model save checkpoints and learning rate adjustment.
 def model_callbacks(filepath):
     checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=filepath,
-                                                    monitor='val_acc',
+                                                    monitor='val_accuracy',
                                                     verbose=1,
                                                     save_best_only=True)
 
     lr_scheduler = tf.keras.callbacks.LearningRateScheduler(lr_schedule)
-
-    lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(factor=np.sqrt(0.1),
-                                                    cooldown=0,
-                                                    patience=5,
-                                                    min_lr=0.5e-6)
+    lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(monitor='loss',
+                                                      factor=np.sqrt(0.1),
+                                                      cooldown=0,
+                                                      patience=5,
+                                                      min_lr=0.5e-6)
 
     callbacks = [checkpoint, lr_reducer, lr_scheduler]
     return callbacks
 
 #Visualise ou4 training results
 def training_results(history, EPOCHS):
-    acc = history.history['acc']
-    val_acc = history.history['val_acc']
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
     loss = history.history['loss']
     val_loss = history.history['val_loss']
 
@@ -187,8 +192,8 @@ def main():
     data_file, image_dir = get_data_consts()
 
     # Get image and label array
-    input_shape, image_array = image_array(image_dir)
-    classes_dict, label_array = label_array(data_file)
+    input_shape, image_array = get_image_array(image_dir)
+    _, label_array = get_label_array(data_file)
 
     # Normalise image data and display sample images
     image_array = image_array.astype('float32') / 255
@@ -209,7 +214,7 @@ def main():
     image_sample(imgaug, lblaug)
 
     # Define optimiser and compile our ResNet model
-    model = compile_model(input_shape, depth)
+    model = compile_model(input_shape, depth, NUM_CLASSES)
 
     # Prepare model save directory and callbacks
     filepath = model_save_dir(model_type)

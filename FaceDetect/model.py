@@ -1,3 +1,8 @@
+# ---------------------------------------
+# Resnet model addapted from Kera website:
+# https://keras.io/api/applications/resnet/
+# ---------------------------------------
+
 import tensorflow as tf
 from keras.regularizers import l2
 from keras import backend as K
@@ -38,7 +43,7 @@ def resnet_layer(inputs,
 #End ResNet layer
 
 #Define our ResNet model
-def resnet(input_shape, depth, num_classes=NUM_CLASSES):
+def resnet(input_shape, depth, num_classes):
     num_filters_in = 16
     num_res_blocks = int((depth -2) / 9)
     inputs = tf.keras.Input(shape=input_shape)
