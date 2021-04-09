@@ -10,13 +10,15 @@ import os
 import numpy as np
 import tensorflow as tf
 
+# Define model file paths
 def get_model_paths():
     cascPath = os.curdir + '/saved_models/haarcascade_frontalface_default.xml'
-    modelPath = os.curdir + '/saved_models/EmoDetect_ResNet164v2_model.068.h5'
+    modelPath = os.curdir + '/saved_models/EmoDetect_ResNet164v2_model.Epoch-84.h5'
     
     return cascPath, modelPath
 
 
+# Define emoji image paths
 def get_emoji_paths():
     img_path = os.curdir + '/img/emojis/'
     angry_emj = cv2.imread(img_path + 'angry.png')
@@ -31,6 +33,7 @@ def get_emoji_paths():
            happy_emj, sad_emj, surprised_emj, neutral_emj
 
 
+# Define dictionaries, mapping classes to emojis
 def get_dicts(angry_emj, disgust_emj, fear_emj, happy_emj, sad_emj, surprised_emj, neutral_emj):
     classes_dict = {0:'Angry', 1:'Disgust', 2:'Fear', 3:'Happy', 
                     4:'Sad', 5:'Surprised', 6:'Neutral'}
@@ -40,7 +43,8 @@ def get_dicts(angry_emj, disgust_emj, fear_emj, happy_emj, sad_emj, surprised_em
     return classes_dict, emoji_dict
 
 
-def capture_and_detect(video_capture, faceCascade, model, emoji_dict, classes_dict):
+# Main video capture/emotion detection loop, press q to quit
+def capture_and_detect(video_capture, faceCascade, model, emoji_dict, classes_dict, neutral_emj):
     while True:
         # Capture frame-by-frame
         _, frame = video_capture.read()
@@ -98,14 +102,13 @@ def main():
     faceCascade = cv2.CascadeClassifier(cascPath)
     video_capture = cv2.VideoCapture(0)
 
-    # Main video capture loop
-    capture_and_detect(video_capture, faceCascade, model, emoji_dict, classes_dict)
+    # Main video capture loop, press q to quit
+    capture_and_detect(video_capture, faceCascade, model, emoji_dict, classes_dict, neutral_emj)
 
     # When everything is done, release the capture
     video_capture.release()
     cv2.destroyAllWindows()
     
-
 
 if __name__ == "__main__":
     main()
