@@ -1,7 +1,7 @@
 # ----------------------------------------------
 # Author: Alex Varano
 # Main video capture and expression detection code
-# utilising model saved by training.py
+# utilising model saved by train.py
 # ----------------------------------------------
 
 from cv2 import cv2
@@ -72,13 +72,12 @@ def capture_and_detect(video_capture, faceCascade, model, emoji_dict, classes_di
             expression = int(np.argmax(expression, axis = 1))
             overlay = emoji_dict.get(expression, neutral_emj)
             result = classes_dict.get(expression, "Don't know")
+            # Add emoji and text to top left corner
+            rows, cols, _ = overlay.shape
+            frame[0:rows, 0:cols ] = overlay
+            cv2.putText(frame, result, (rows+30, cols//2), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (209, 80, 0, 255), 3)
         except:
             print("Problem getting facial expression...")
-
-        # Add emoji and text to top left corner
-        rows, cols, _ = overlay.shape
-        frame[0:rows, 0:cols ] = overlay
-        cv2.putText(frame, result, (rows+30, cols//2), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (209, 80, 0, 255), 3)
 
         # Display the resulting frame
         cv2.imshow('Video', frame)
