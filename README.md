@@ -7,4 +7,4 @@ Detect 6 different emotions from a human face in real-time (happy, sad, angry, s
 ### TextSentiment
 Detects the sentiment of user inputted text as either Positive or Negative.
 ### Chatbot
-Chatbot experimentation with LSTM and Bi-directional LSTM neural networks.
+Work in progress....
