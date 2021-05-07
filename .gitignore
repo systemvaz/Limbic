@@ -1,0 +1,9 @@
+FaceDetect/__pycache__/
+FaceDetect/dataset/
+TextSentiment/__pycache__/
+TextSentiment/venv/
+TextSentiment/tokeniser.json
+TextSentiment/saved_models/
+TextSentiment/data/training_data_BERT.h5
+TextSentiment/data/twitter_train.csv
+TextSentiment/data/twitter_all.csv
