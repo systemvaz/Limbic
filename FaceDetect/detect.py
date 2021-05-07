@@ -10,6 +10,8 @@ import os
 import numpy as np
 import tensorflow as tf
 
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
+
 # Define model file paths
 def get_model_paths():
     cascPath = os.curdir + '/saved_models/haarcascade_frontalface_default.xml'
