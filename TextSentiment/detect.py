@@ -26,4 +26,4 @@ while True:
     sentence = tokeniser.texts_to_sequences(sentence)
     sentence = tf.keras.preprocessing.sequence.pad_sequences(sentence, maxlen=max_length)
     sentiment = model.predict_classes(sentence)
-    print('Sentence is: ', sentiment_dict.get(int(sentiment), "Don't know!"))
+    print('Sentence is: ', sentiment_dict.get(int(sentiment), "Don't know!!"))
