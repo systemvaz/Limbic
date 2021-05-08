@@ -10,6 +10,7 @@ Experimentation with tokenisation text preprocessing, including the utilisation 
 * 2.) Run preprocess_data.py to clean dataset
 * 3.) Run bert_preprocess.py to generate h5 file with required input ids + masks and segment ids
 * 4.) Optionaly run check_bert_data.py to confirm shape and data generated in step 3
-* 5.) Run train_BERT.py to perform model training. Approx ~30 hours on a GTX1080ti for 3 epochs
+* 5.) Run train_BERT.py to perform model training. ~9.5 hours per epoch on a GTX1080ti (only 1 epoch required for 84.5% accuracy)
 * 6.) Run main detection program detect.py
 ## Training Results
+![alt text](https://github.com/systemvaz/Limbic/blob/master/TextSentiment/img/Bert_training_results.png)
