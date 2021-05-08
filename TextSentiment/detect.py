@@ -57,7 +57,7 @@ def main():
         if sentence == 'q':
             break
 
-        sentence_to_bert = convert_sentence_to_features(sentence, tokeniser, 240)
+        sentence_to_bert = convert_sentence_to_features(sentence.lower(), tokeniser, 240)
         sentiment = model.predict(sentence_to_bert)
         print("Sentence is: {}".format(sentiment_dict.get(np.argmax(sentiment))))
 
