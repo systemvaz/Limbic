@@ -1,6 +1,8 @@
 # Positive/Negative Text sentiment detection
 ## About
 Detects the sentiment of user inputted text as either Positive or Negative
+![alt text](https://github.com/systemvaz/Limbic/blob/master/TextSentiment/img/demo.PNG)
+
 ## Training dataset
 The Sentiment140 dataset was utilised containing 1.6 million tweets from Twitter and associated annotated sentiment either being Positive or Negative.
 ## Architecture
