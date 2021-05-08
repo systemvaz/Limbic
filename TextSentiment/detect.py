@@ -7,9 +7,6 @@ from keras_preprocessing.text import tokenizer_from_json
 
 import tokenization
 
-max_length = 400 # was 400
-max_features = 20000
-
 model_path = os.curdir + '/saved_models/TxtSentiment_model_BERT.001.h5'
 vocab_file = os.curdir + '/data/vocab.txt'
 
