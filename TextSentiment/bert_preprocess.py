@@ -17,7 +17,7 @@ np.random.seed(seed)
 tf.random.set_seed(seed)
 
 
-def create_tokenizer(vocab_file, do_lower_case=False):
+def create_tokenizer(vocab_file, do_lower_case=True):
     return tokenization.FullTokenizer(vocab_file=vocab_file, do_lower_case=do_lower_case)
     
 
