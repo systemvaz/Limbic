@@ -7,6 +7,6 @@ Detect 6 different emotions from a human face in real-time (happy, sad, angry, s
 <img src="https://github.com/systemvaz/Limbic/blob/master/FaceDetect/img/Demo.PNG" height="30%" width="30%">
 ### TextSentiment
 Detects the sentiment of user inputted text as either Positive or Negative.
-<img src="https://github.com/systemvaz/Limbic/blob/master/TextSentiment/img/demo.PNG" height="60%" width="60%" >
+<img src="https://github.com/systemvaz/Limbic/blob/master/TextSentiment/img/demo.PNG" height="80%" width="80%" >
 ### Chatbot
 Work in progress....
