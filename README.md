@@ -1,5 +1,4 @@
 # Limbic
-<img src="https://github.com/systemvaz/Limbic/blob/master/FaceDetect/img/Demo.PNG" height="40%" width="40%" />
 ## About
 Experiment exploring possible improvements in chatbot interaction by using real-time face/expression video image recognition and text sentiment analysis implemented in TensorFlow and Python. This is an experiment in progress, some local modifications may be required if you fork/clone this repo.
 ## Modules
